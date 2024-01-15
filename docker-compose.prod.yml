@@ -1,0 +1,10 @@
+version: '3'
+services:
+  server:
+    image: itkyryl/server-prod-arbitrage:latest
+    container_name: server-prod
+    command:
+      - node
+      - ./dist/index.js
+    environment:
+      - NODE_ENV=production

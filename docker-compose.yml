@@ -1,0 +1,22 @@
+version: '3'
+services:
+  db:
+    image: postgres:latest
+    container_name: db-postgres
+    environment:
+      - POSTGRES_DB=arbitrage
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=arbitrage
+    ports:
+      - "5433:5433"
+    volumes:
+      - postgres_arbitrage_data:/var/lib/postgresql/data
+  server:
+    env_file:
+      - .env
+    ports:
+      - 5001:5001
+volumes:
+  postgres_arbitrage_data:
+    name: postgres-arbitrage-data
+  
