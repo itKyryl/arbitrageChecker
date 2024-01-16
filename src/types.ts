@@ -1,6 +1,7 @@
 import TelegramBot from "node-telegram-bot-api"
 import { Mode, UseFor } from "./db/entities/live/TelegramUser"
 import { AccountType, IgnoreAccountUseFor } from "./db/entities/live/IgnoreAccount"
+import { Context } from "telegraf"
 
 export type ENV = {
     NODE_ENV: string
@@ -112,3 +113,11 @@ export type NewIgnoreAccount = {
     accountType: AccountType;
     useFor: IgnoreAccountUseFor;
 }
+
+export type TelegrafBotOnTextRule = {
+    text: string,
+    function: (msg: Context, message: string) => any
+}
+
+export const nodeEnvArray = ['production', 'development'] as const;
+export type NodeEnv = typeof nodeEnvArray[number];
