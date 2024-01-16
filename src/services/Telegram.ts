@@ -7,6 +7,7 @@ import splitText from "../utils/splitText";
 import TelegramUser from "../db/entities/live/TelegramUser";
 import { allIgnoreAccounts } from "../helpers/telegramIgnoreAccount.helper";
 import { addUser, allUsers, removeUsers } from "../helpers/telegramUser.helper";
+import { addIgnoreDomain, allIgnoreDomains, removeIgnoreDomains } from '../helpers/telegramIgnoreDomain.helper';
 
 class Telegram {
     private bot: Telegraf;
@@ -21,11 +22,16 @@ class Telegram {
             { text: '/start', function: start },
             { text: '/chat_id', function: chatId },
             { text: '/menu', function: menu},
-            { text: '/add_user', function: addUser},
-            { text: Button.SHOW_ALL_IGNORE_ACCOUNTS, function: allIgnoreAccounts},
             { text: Button.SHOW_ALL_USERS, function: allUsers},
+            { text: '/add_user', function: addUser},
+            { text: '/remove_users', function: removeUsers},
+            { text: Button.SHOW_ALL_IGNORE_ACCOUNTS, function: allIgnoreAccounts},
+            { text: '/add_ignore_account', function: addIgnoreDomain},
+            { text: '/remove_ignore_accounts', function: removeIgnoreDomains},
+            { text: Button.SHOW_ALL_IGNORE_DOMAINS, function: allIgnoreDomains},
+            { text: '/add_ignore_domain', function: addIgnoreDomain},
+            { text: '/remove_ignore_domains', function: removeIgnoreDomains},
             { text: Button.CLOSE, function: closeMenu},
-            { text: '/remove_users', function: removeUsers}
         ]
 
         this.bot.on('text', (ctx) => {

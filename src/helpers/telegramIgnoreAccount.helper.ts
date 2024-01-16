@@ -1,4 +1,3 @@
-import TelegramBot from "node-telegram-bot-api";
 import { NewIgnoreAccount } from "../types";
 import { NEW_IGNORE_ACCOUNT_PATTERN, REMOVE_IGNORE_ACCOUNT_PATTERN } from './telegram.helper';
 import IgnoreAccountController from "../db/controllers/IgnoreAccount.controller";

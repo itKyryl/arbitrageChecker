@@ -1,4 +1,4 @@
-import { StatusObject, TikTokAccount, TikTokAd, WrongTextUrlInfo } from "../types";
+import { IgnoreUseFor, StatusObject, TikTokAccount, TikTokAd, WrongTextUrlInfo } from "../types";
 import { convertTimeToMs } from "../utils/ms";
 import Timer from "../utils/timer";
 import TikTokAPI from '../api/TikTok.api';
@@ -8,7 +8,8 @@ import Telegram from '../services/Telegram';
 import TelegramUserController from '../db/controllers/TelegramUser.controller';
 import { UseFor } from "../db/entities/live/TelegramUser";
 import IgnoreAccountController from "../db/controllers/IgnoreAccount.controller";
-import { AccountType, IgnoreAccountUseFor } from "../db/entities/live/IgnoreAccount";
+import { AccountType } from "../db/entities/live/IgnoreAccount";
+import IgnoreDomainController from "../db/controllers/IgnoreDomain.controller";
 
 const INTERVAL = convertTimeToMs({hours: 0, minutes: 30, seconds: 0});
 
@@ -47,7 +48,8 @@ async function checkAccountsAds(tikTokApi: TikTokAPI, accounts: TikTokAccount[])
     const binomDomainsObj = await binomApi.getAllDomains({action: 'domain@get_all', api_key: env('BINOM_TOKEN_API')});
     const binomDomains: string[] = binomDomainsObj.map( obj => obj.name);
 
-    const ttDomainsIgnoreAccounts = (await IgnoreAccountController.getAllIgnoreAccounts()).filter(account => account.accountType === AccountType.TT && account.useFor === IgnoreAccountUseFor.DOMAIN_CHECKING).map(account => account.accountId);
+    const ttDomainsIgnoreAccounts = (await IgnoreAccountController.getAllIgnoreAccounts()).filter(account => account.accountType === AccountType.TT && account.useFor === IgnoreUseFor.DOMAIN_CHECKING).map(account => account.accountId);
+    const ttIgnoredDomains = (await IgnoreDomainController.getAllIgnoreDomains()).filter(domain => domain.useFor === IgnoreUseFor.DOMAIN_CHECKING).map(domain => domain.domainName);
 
     for(let [id, account] of Object.entries(accounts)) {
         const ads = await tikTokApi.getAds({advertiser_id: account.advertiser_id});
@@ -56,7 +58,7 @@ async function checkAccountsAds(tikTokApi: TikTokAPI, accounts: TikTokAccount[])
 
         //check if account ignore exist
         if(!ttDomainsIgnoreAccounts.includes(account.advertiser_id)) {
-            errorTextParamInfos.push(...await checkAdDomain(ads.list, account, binomDomains));
+            errorTextParamInfos.push(...await checkAdDomain(ads.list, account, binomDomains, ttIgnoredDomains));
         }
 
         console.log(`${Number.parseInt(id) + 1}/${accounts.length} accounts resolved.`);
@@ -108,13 +110,14 @@ function checkAdUrlText(ads: TikTokAd[], account: TikTokAccount): WrongTextUrlIn
     return errorTextParamInfos;
 }
 
-async function checkAdDomain(ads: TikTokAd[], account: TikTokAccount, binomDomains: string[]): Promise<WrongTextUrlInfo[]> {
+async function checkAdDomain(ads: TikTokAd[], account: TikTokAccount, binomDomains: string[], ttIgnoredDomains: string[]): Promise<WrongTextUrlInfo[]> {
     const domainErrors: WrongTextUrlInfo[] = [];
     for(let ad of ads) {
         try {
             if(ad.landing_page_url) {
                 const url = new URL(ad.landing_page_url);
-                if(!binomDomains.includes(url.hostname) && ad.operation_status === 'ENABLE') {
+                // if binom not include domain and ad still running and ignore domains not include the domain
+                if(!binomDomains.includes(url.hostname) && ad.operation_status === 'ENABLE' && !ttIgnoredDomains.includes(url.hostname)) {
                     domainErrors.push({
                         account,
                         ad,

@@ -1,6 +1,7 @@
 import { Repository } from 'typeorm';
 import AppDataSource from '../data-source';
-import IgnoreAccount, {IgnoreAccountUseFor} from '../entities/live/IgnoreAccount';
+import IgnoreAccount from '../entities/live/IgnoreAccount';
+import { IgnoreUseFor } from '../../types';
 
 class IgnoreAccountController {
     private telegramIgnoreAccountRepository: Repository<IgnoreAccount>;
@@ -9,7 +10,7 @@ class IgnoreAccountController {
         this.telegramIgnoreAccountRepository = AppDataSource.getRepository(IgnoreAccount);
     }
 
-    public async getIgnoreAccountsByUseFor(useFor: IgnoreAccountUseFor): Promise<IgnoreAccount[]> {
+    public async getIgnoreAccountsByUseFor(useFor: IgnoreUseFor): Promise<IgnoreAccount[]> {
         
         return await this.telegramIgnoreAccountRepository.findBy({useFor});
     }

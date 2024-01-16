@@ -1,6 +1,6 @@
 import TelegramBot from "node-telegram-bot-api"
 import { Mode, UseFor } from "./db/entities/live/TelegramUser"
-import { AccountType, IgnoreAccountUseFor } from "./db/entities/live/IgnoreAccount"
+import { AccountType } from "./db/entities/live/IgnoreAccount"
 import { Context } from "telegraf"
 
 export type ENV = {
@@ -111,7 +111,13 @@ export type BinomDomain = {
 export type NewIgnoreAccount = {
     accountId: string;
     accountType: AccountType;
-    useFor: IgnoreAccountUseFor;
+    useFor: IgnoreUseFor;
+}
+
+export type NewIgnoreDomain = {
+    description: string;
+    domainName: string;
+    useFor: IgnoreUseFor;
 }
 
 export type TelegrafBotOnTextRule = {
@@ -121,3 +127,8 @@ export type TelegrafBotOnTextRule = {
 
 export const nodeEnvArray = ['production', 'development'] as const;
 export type NodeEnv = typeof nodeEnvArray[number];
+
+export enum IgnoreUseFor {
+    DOMAIN_CHECKING = 'domainChecking'
+}
+

@@ -1,14 +1,10 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import Base from '../abstract/Base';
+import { IgnoreUseFor } from "../../../types";
 
 
 export enum AccountType {
     FB = 'fb',
     TT = 'tt'
-}
-
-export enum IgnoreAccountUseFor {
-    DOMAIN_CHECKING = 'domainChecking'
 }
 
 @Entity()
@@ -22,8 +18,8 @@ class IgnoreAccount {
     @Column({type: 'enum', nullable: false, enum: AccountType})
     accountType: AccountType;
 
-    @Column({type: 'enum', enum: IgnoreAccountUseFor, nullable: false})
-    useFor: IgnoreAccountUseFor
+    @Column({type: 'enum', enum: IgnoreUseFor, nullable: false})
+    useFor: IgnoreUseFor
 }
 
 export default IgnoreAccount;
